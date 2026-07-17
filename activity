@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio Tycoon — SDS Producers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#141414;
+    --paper:#f7f5f0;
+    --line:rgba(20,20,20,0.10);
+    --line-strong:rgba(20,20,20,0.18);
+    --gold:#a5822a;
+    --muted:#6b6b64;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:920px;margin:0 auto;padding:0 28px;}
+
+  header{padding:20px 28px;border-bottom:1px solid var(--line);}
+  .brand{
+    font-family:'Fraunces',serif;font-weight:500;font-size:18px;letter-spacing:0.3px;
+    max-width:920px;margin:0 auto;
+  }
+  .brand em{font-style:italic;color:var(--gold);}
+  .brand a{color:var(--muted);font-size:13px;font-weight:500;float:right;padding-top:3px;}
+  .brand a:hover{color:var(--ink);}
+
+  .hero{padding:56px 28px 34px;text-align:center;}
+  .eyebrow{
+    font-size:11px;letter-spacing:3.5px;text-transform:uppercase;color:var(--muted);
+    font-weight:600;margin-bottom:18px;
+  }
+  .eyebrow::before{content:'— ';}
+  .hero h1{
+    font-family:'Fraunces',serif;font-weight:500;
+    font-size:clamp(32px,6vw,54px);line-height:1.05;letter-spacing:-0.5px;
+  }
+  .hero h1 i{font-style:italic;font-weight:400;color:var(--gold);}
+  .hero p.sub{max-width:460px;margin:20px auto 0;font-size:15.5px;line-height:1.7;color:var(--muted);}
+
+  .game{padding:20px 28px 110px;}
+  .grid{display:grid;grid-template-columns:1fr 1.3fr;gap:1px;background:var(--line-strong);border:1px solid var(--line-strong);}
+
+  .panel{background:var(--paper);padding:44px 36px;}
+
+  .stat-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:10px;}
+  .idea-count{
+    font-family:'Fraunces',serif;font-weight:500;font-size:clamp(46px,7vw,64px);
+    letter-spacing:-1px;line-height:1;margin-bottom:6px;
+  }
+  .idea-rate{font-size:12.5px;color:var(--gold);font-weight:500;margin-bottom:34px;}
+
+  #clickBtn{
+    width:100%;padding:26px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);
+    font-family:'Fraunces',serif;font-weight:500;font-size:18px;cursor:pointer;
+    transition:background .15s ease,transform .08s ease;position:relative;overflow:hidden;
+  }
+  #clickBtn:hover{background:var(--gold);}
+  #clickBtn:active{transform:scale(0.98);}
+  #clickBtn .hint{display:block;font-family:'Inter',sans-serif;font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;opacity:.7;margin-top:6px;}
+
+  .progress-block{margin-top:36px;}
+  .progress-head{display:flex;justify-content:space-between;font-size:11.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:9px;}
+  .progress-head b{color:var(--ink);font-weight:600;}
+  .progress-bar{height:3px;background:var(--line-strong);}
+  .progress-fill{height:100%;background:var(--gold);width:0%;transition:width .4s ease;}
+
+  .upgrades{background:var(--paper);padding:44px 36px;}
+  .upgrade{
+    display:flex;justify-content:space-between;align-items:center;gap:16px;
+    padding:18px 0;border-bottom:1px solid var(--line);cursor:pointer;
+    transition:padding-left .2s ease;
+  }
+  .upgrade:first-child{padding-top:0;}
+  .upgrade:hover:not(.disabled){padding-left:8px;}
+  .upgrade.disabled{opacity:.4;cursor:default;}
+  .upgrade-name{font-family:'Fraunces',serif;font-weight:500;font-size:17px;}
+  .upgrade-desc{font-size:12.5px;color:var(--muted);margin-top:4px;}
+  .upgrade-right{text-align:right;flex-shrink:0;}
+  .upgrade-cost{font-size:13px;font-weight:600;color:var(--gold);}
+  .upgrade-owned{font-size:11px;color:var(--muted);margin-top:3px;}
+
+  .toast{
+    position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:var(--paper);padding:14px 24px;font-size:13.5px;font-weight:500;
+    max-width:420px;text-align:center;opacity:0;transition:opacity .3s ease,transform .3s ease;
+    z-index:100;pointer-events:none;
+  }
+  .toast.in{opacity:1;transform:translateX(-50%) translateY(0);}
+  .toast i{font-style:italic;color:var(--gold);}
+
+  .finale{
+    display:none;text-align:center;padding:70px 28px;
+  }
+  .finale.in{display:block;}
+  .finale .k{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:14px;}
+  .finale h2{font-family:'Fraunces',serif;font-weight:500;font-size:clamp(30px,5vw,46px);margin-bottom:16px;}
+  .finale h2 i{font-style:italic;color:var(--gold);}
+  .finale p{color:var(--muted);font-size:15px;max-width:420px;margin:0 auto 32px;line-height:1.7;}
+  .btn{
+    font-weight:600;font-size:13px;letter-spacing:0.3px;padding:15px 32px;border:1px solid var(--ink);
+    display:inline-block;background:none;cursor:pointer;font-family:'Inter',sans-serif;
+    transition:background .2s ease,color .2s ease;
+  }
+  .btn-ghost:hover{background:var(--ink);color:var(--paper);}
+
+  footer{padding:50px 28px 40px;text-align:center;}
+  footer p{color:var(--muted);font-size:12px;letter-spacing:0.3px;}
+
+  @media (max-width:760px){
+    .grid{grid-template-columns:1fr;}
+    .panel,.upgrades{padding:32px 24px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">SDS <em>Producers</em> <a href="index.html">← Back to site</a></div>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">An unofficial side project</div>
+  <h1>Studio <i>Tycoon.</i></h1>
+  <p class="sub">Click to generate story ideas, spend them building up the crew, and see how far a scrappy three-person studio can go before the premiere.</p>
+</section>
+
+<section class="game" id="gameSection">
+  <div class="wrap">
+    <div class="grid">
+      <div class="panel">
+        <div class="stat-label">Story ideas banked</div>
+        <div class="idea-count" id="ideaCount">0</div>
+        <div class="idea-rate" id="ideaRate">+0 per second</div>
+
+        <button id="clickBtn">
+          Brainstorm
+          <span class="hint">+<span id="clickPower">1</span> idea per click</span>
+        </button>
+
+        <div class="progress-block">
+          <div class="progress-head"><span>Film progress</span><b id="progressPct">0%</b></div>
+          <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+      </div>
+
+      <div class="upgrades" id="upgradesPanel">
+        <div class="stat-label" style="margin-bottom:26px;">Invest in the studio</div>
+        <div id="upgradeList"></div>
+      </div>
+    </div>
+
+    <div class="finale" id="finale">
+      <div class="k">Premiere night</div>
+      <h2>It's finished. <i>Roll credits.</i></h2>
+      <p id="finaleText"></p>
+      <button class="btn btn-ghost" id="restartBtn">Start another production</button>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<footer>
+  <p>A studio built entirely out of clicking. Results may vary in real life.</p>
+</footer>
+
+<script>
+  const GOAL = 2000;
+  let ideas = 0;
+  let clickPower = 1;
+  let perSecond = 0;
+  let finished = false;
+
+  const upgrades = [
+    { id: 'coffee', name: 'Coffee run', desc: 'Sharper thinking, +1 idea per click.', baseCost: 20, owned: 0, type: 'click', amount: 1 },
+    { id: 'notebook', name: 'Proper notebook', desc: 'Nothing gets forgotten, +2 ideas per click.', baseCost: 60, owned: 0, type: 'click', amount: 2 },
+    { id: 'shaurya', name: 'Shaurya on editing', desc: 'Cuts ideas into shape automatically, +1 idea per second.', baseCost: 50, owned: 0, type: 'auto', amount: 1 },
+    { id: 'druthi', name: 'Druthi directing full-time', desc: 'Keeps the whole crew moving, +3 ideas per second.', baseCost: 150, owned: 0, type: 'auto', amount: 3 },
+    { id: 'saanvi', name: 'Saanvi doubling up roles', desc: 'Acting and editing at once, +6 ideas per second.', baseCost: 400, owned: 0, type: 'auto', amount: 6 },
+    { id: 'snacks', name: 'Stock the snack table', desc: 'A fed crew is a fast crew, +10 ideas per second.', baseCost: 900, owned: 0, type: 'auto', amount: 10 }
+  ];
+
+  const events = [
+    "A three a.m. idea turns out to be the best plot twist in the film.",
+    "The crew argues about the ending for twenty minutes. The ending gets better.",
+    "Someone rewatches the raw footage and finds an accidental perfect shot.",
+    "A scene gets cut entirely. Nobody misses it.",
+    "The whole crew agrees on something for the first time all week."
+  ];
+
+  const ideaCountEl = document.getElementById('ideaCount');
+  const ideaRateEl = document.getElementById('ideaRate');
+  const clickPowerEl = document.getElementById('clickPower');
+  const clickBtn = document.getElementById('clickBtn');
+  const progressPct = document.getElementById('progressPct');
+  const progressFill = document.getElementById('progressFill');
+  const upgradeList = document.getElementById('upgradeList');
+  const toast = document.getElementById('toast');
+  const finale = document.getElementById('finale');
+  const finaleText = document.getElementById('finaleText');
+  const gameSection = document.getElementById('gameSection');
+  const restartBtn = document.getElementById('restartBtn');
+
+  function cost(u){ return Math.round(u.baseCost * Math.pow(1.55, u.owned)); }
+
+  function renderUpgrades(){
+    upgradeList.innerHTML = '';
+    upgrades.forEach(u => {
+      const c = cost(u);
+      const div = document.createElement('div');
+      div.className = 'upgrade' + (ideas < c ? ' disabled' : '');
+      div.innerHTML = `
+        <div>
+          <div class="upgrade-name">${u.name}</div>
+          <div class="upgrade-desc">${u.desc}</div>
+        </div>
+        <div class="upgrade-right">
+          <div class="upgrade-cost">${c} ideas</div>
+          <div class="upgrade-owned">Owned: ${u.owned}</div>
+        </div>`;
+      div.addEventListener('click', () => buy(u));
+      upgradeList.appendChild(div);
+    });
+  }
+
+  function buy(u){
+    const c = cost(u);
+    if (ideas < c || finished) return;
+    ideas -= c;
+    u.owned++;
+    if (u.type === 'click') clickPower += u.amount;
+    if (u.type === 'auto') perSecond += u.amount;
+    clickPowerEl.textContent = clickPower;
+    ideaRateEl.textContent = `+${perSecond} per second`;
+    updateDisplay();
+    renderUpgrades();
+    showToast(`${u.name} added to the crew.`);
+  }
+
+  let toastTimer = null;
+  function showToast(msg){
+    toast.innerHTML = msg;
+    toast.classList.add('in');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('in'), 2400);
+  }
+
+  function updateDisplay(){
+    ideaCountEl.textContent = Math.floor(ideas).toLocaleString();
+    const pct = Math.min(100, Math.round((ideas / GOAL) * 100));
+    progressPct.textContent = pct + '%';
+    progressFill.style.width = pct + '%';
+    if (ideas >= GOAL && !finished) finishGame();
+  }
+
+  function finishGame(){
+    finished = true;
+    const totalOwned = upgrades.reduce((s,u) => s + u.owned, 0);
+    finaleText.textContent = `The film wrapped with ${totalOwned} crew upgrades along the way and a final idea bank of ${Math.floor(ideas).toLocaleString()}. Not bad for three people and a lot of coffee.`;
+    finale.classList.add('in');
+    gameSection.querySelector('.grid').style.opacity = '0.35';
+    gameSection.querySelector('.grid').style.pointerEvents = 'none';
+  }
+
+  clickBtn.addEventListener('click', () => {
+    if (finished) return;
+    ideas += clickPower;
+    updateDisplay();
+    renderUpgrades();
+    if (Math.random() < 0.06) {
+      showToast(events[Math.floor(Math.random() * events.length)]);
+    }
+  });
+
+  setInterval(() => {
+    if (finished) return;
+    if (perSecond > 0) {
+      ideas += perSecond / 10;
+      updateDisplay();
+      renderUpgrades();
+    }
+  }, 100);
+
+  restartBtn.addEventListener('click', () => {
+    ideas = 0; clickPower = 1; perSecond = 0; finished = false;
+    upgrades.forEach(u => u.owned = 0);
+    clickPowerEl.textContent = 1;
+    ideaRateEl.textContent = '+0 per second';
+    finale.classList.remove('in');
+    gameSection.querySelector('.grid').style.opacity = '1';
+    gameSection.querySelector('.grid').style.pointerEvents = 'auto';
+    updateDisplay();
+    renderUpgrades();
+  });
+
+  renderUpgrades();
+  updateDisplay();
+</script>
+
+</body></html>
